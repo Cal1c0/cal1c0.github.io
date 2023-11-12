@@ -1,7 +1,7 @@
 ---
 title:  "HTB Intentions Writeup"
 date:   2023-10-14 14:26:19 +0200
-categories: HTB writeup
+categories: HTB Machine
 tags: SQLI HTB
 ---
 
@@ -12,6 +12,8 @@ tags: SQLI HTB
 ## Introduction
 
 Intentions was a very interesting machine that put a heavy emphasis on proper enumeration of the machine as multiple pieces were needed to be found to piece together the initial access vector. The privesc was about thinking outside of the box related to badly designed custom binary.
+
+If you like any of my content it would help a lot if you used my referral link to buy Hack the box/ Academy Subscriptions which you can find on my about page.
 
 ## Initial access
 ### Recon

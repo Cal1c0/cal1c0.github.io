@@ -1,7 +1,7 @@
 ---
 title:  "HTB Gofer Writeup"
 date:   2023-10-28 00:30:00 
-categories: HTB writeup
+categories: HTB Machine
 tags: HTB Subdomain_enumeration Gopher Binary_exploitation
 ---
 
@@ -12,6 +12,8 @@ tags: HTB Subdomain_enumeration Gopher Binary_exploitation
 ## Introduction
 
 To me it was an interesting machine. The initial access had a solid amount of basic enumeration and in the end felt like you're piecing a puzzle together to end up with a working exploit. For the privilege escalation part it was my first time ever doing binary exploitation so it was a very interesting experience. Exploiting this binary required me to read up on a lot of internal workings of the C language. I hope you enjoy the write up :D
+
+If you like any of my content it would help a lot if you used my referral link to buy Hack the box/ Academy Subscriptions which you can find on my about page.
 
 ## Initial access
 ### Recon
