@@ -252,7 +252,7 @@ python sign.py -c keypgp_uwu.pub.asc -k keypgp_uwu.key.asc -p test123 -m "test"
 
 This resulted in a reverse shell.
 
-![Shell as Atlas](/assets/img/Sandworm/Sandworm_05.png)
+![Shell as Atlas](/assets/img/Sandworm/Sandworm_06.png)
 
 ## Lateral movement
 
@@ -260,7 +260,7 @@ This resulted in a reverse shell.
 
 So now we have a shell as atlas, however what we can do is very limited. We are in some kind of jailed environment. When doing some enumeration on the file system i found the .config directory in the home folder of atlas **/home/atlas/.config**. This directory showed us two folders one being **firejail** and **httpie**
 
-![Config directory](/assets/img/Sandworm/Sandworm_06.png)
+![Config directory](/assets/img/Sandworm/Sandworm_07.png)
 
 
 This tells us that the jail used was probably firejail, and when digging deeper down into the httpie directory the clear text credentials of silentobserver could be found in the file **/home/atlas/.config/httpie/sessions/localhost_5000/admin.json**
