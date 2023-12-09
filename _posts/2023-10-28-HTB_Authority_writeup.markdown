@@ -356,7 +356,7 @@ evil-winrm -u svc_ldap -p 'lDaP_1n_th3_cle4r!' -i authority.htb
 
 ## Privilege escalation
 
-So knowing that there is an ADCS service based from the Ansible scripts as well as the name of the machine. my first instinct was to check if there were any vulnreable certificates using ceritpy
+So knowing that there is an ADCS service based from the Ansible scripts as well as the name of the machine. my first instinct was to check if there were any vulnreable certificates using certipy
 
 ```bash
 certipy find -username 'svc_ldap@authority.htb' -password 'lDaP_1n_th3_cle4r!' -vulnerable -enabled
