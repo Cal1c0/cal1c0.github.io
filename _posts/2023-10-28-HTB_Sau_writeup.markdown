@@ -7,7 +7,7 @@ tags: SSRF CVE-2023–27163 maltrail request-baskets sudo_abuse
 
 ![Sau](/assets/img/Sau/1688659208347.jpg)
 
-## Introduction
+## Introduction 
 
 Sau was a very easy machine that relied on chaining multiple pubicly known vulnerabilities till you reach code execution. The privesc method was also fairly trivial using one of the easiest privesc methods possible. This box is nice for a beginner or for refreshing some of the basics.
 
