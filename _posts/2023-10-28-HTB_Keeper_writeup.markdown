@@ -1,6 +1,6 @@
 ---
 title:  "HTB Keeper Writeup"
-date:   2023-12-09 00:30:00 
+date:   2024-02-10 00:30:00 
 categories: HTB Machine
 tags: Default_credentials keepass CVE-2023-32784
 ---
