@@ -1,7 +1,7 @@
 ---
 title:  "HTB Clicker Writeup"
 date:   2024-01-27 00:30:00 
-categories: HTB writeup
+categories: HTB Machine
 tags: Binary_exploitation Web Source_code Environment_hijacking
 ---
 
