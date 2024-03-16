@@ -14,7 +14,7 @@ This machine was a fun active directory based machine, Both the initial access a
 If you like any of my content it would help a lot if you used my referral link to buy Hack The Box/Academy Subscriptions which you can find on my about page.
 
 ## Initial access
-### Recon
+### Recon 
 
 To start off our recon we will begin with an Nmap scan of the machine. Using the following command:
 ```
