@@ -7,7 +7,7 @@ tags: SQLI HTB
 
 
 
-![Inetions box card](/assets/img/Intentions/1688114839753.jpg)
+![Intentions box card](/assets/img/Intentions/1688114839753.jpg)
 
 ## Introduction
 
